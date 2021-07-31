@@ -1,42 +1,42 @@
 
-```{r, warning=FALSE, echo=FALSE}
+```{r, warning=FALSE, echo=FALSE, message=FALSE}
 library(ggplot2)
 library(dplyr)
 d <- read.csv("./diamonds4.csv")
 ```
 
-# Analysis of the Color of a Diamond
+# Color
 
 Out of the 4 C attributes, color is the second most important one. The GIA diamond color grades, the Industry standard for a diamonds’ color scale, range from D (colorless) to Z (light yellow or brown). Bluenile only sells colorless(D-F) and near colorless(G-H). In general, the more colorless the diamond the more expensive it is supposed to be.
 
-## Color Frequency
+### Color Frequency
 
 We started off by checking the frequency of occurrences of various colors of diamonds in our data set. It looks like all the colors are represented well enough in our data set.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
 ggplot(d, aes(x=color))+
   geom_bar(fill="blue")+
   labs(x="Color", y="Frequency of color",
        title="Color Frequency")
 ```
 
-## Price vs Color
+### Price vs Color
 
-Then we created a box plot to compare price ranges for different colored diamonds. We transformed the Price variable using the log function to reduce the variation between the data points. The below box plot fails to support the claim that the more colorless a diamond the more it should cost. Surprisingly, H and J grade diamonds show a higher mean price than the colorless diamonds(D, E, F). We suspected some variables other than color might be impacting the price of the diamond. 
+Then we created a box plot to compare price ranges for different colored diamonds. We transformed the Price variable using the log10 function to reduce the variation between the data points. The below box plot fails to support the claim that the more colorless a diamond the more it should cost. Surprisingly, H and J grade diamonds show a higher mean price than the colorless diamonds(D, E, F). We suspected some variables other than color might be impacting the price of the diamond. 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
 ggplot(d, aes(color, log10(price), fill=color))+
   geom_boxplot()+
   labs(x="Color", y="log10(Price)", title="log10(Price) vs Color")
 ```
 To assess the impact of other variables along with color on the price, we created box plots by grouping the other variables into their respective categories and then assessed the impact of color on price.
 
-## Color and Carat Weight Ranges
+### Color and Carat Weight Ranges
 
 Here we have split our data set into different carat weight ranges, and then tried to assess the impact of color on each of these ranges separately. In general, the more colorless the diamond the more expensive it is supposed to be. However, this trend becomes much more apparent for diamonds with >1 carat weight, which can be seen from the boxplots below. As the carat size increases, the colorless diamonds become much more expensive than the more colored diamond. This directly supports the claim made by Bluenile that color is more visible in large diamonds. 
 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
 breaks<-c(0, 0.5, 1, 2, 3, 4, 5, Inf)
 labels<-c("0-0.5 carat weight", "0.5-1 carat weight", "1-2 carat weight", "2-3 carat weight", "3-4 carat weight", "4-5 carat weight", "5+ carat weight") 
 d<-d%>%
@@ -51,7 +51,7 @@ ggplot(d, aes(color, log10(price), fill=color))+
 Then to find a correlation between color and carat weight ranges we also created proportion bar charts. This chart will help us answer questions such as does a particular carat weight range occur more often for a particular color in our data set? The most interesting find in the below color and carat weight ranges chart is that the proportion of diamonds with more than 1 carat weight is much higher in both H and J color-grade diamonds. This actually explains why H and J color-grade diamonds overall had a higher than expected mean price, almost comparable to D/E/F diamonds, in the log10(Price) vs Color box plot.
 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
 ggplot(d, aes(x=color, fill=carat.range))+
   geom_bar(position = "fill")+
   labs(x="Color", y="Proportion of Carat Weight Ranges",
@@ -59,20 +59,13 @@ ggplot(d, aes(x=color, fill=carat.range))+
 ```
 
 
-## Color and Cut
+### Color and Cut
 
-We did a similar analysis for color and cut, where we grouped the data set by cut and then tried to assess the impact of color on each individual group. The box plots in this case didn't show strong evidence that colorless diamond should cost higher than the more colored ones. This maybe because variables other than cut and color might be influencing the price.
-
-```{r, echo=FALSE}
-ggplot(d, aes(color, log10(price), fill=color))+
-  geom_boxplot()+
-  facet_wrap(~cut)
-  labs(x="Color", y="log10(Price)", title="log10(Price) vs Color grouped by cut")
-```
-Then to find a correlation between color and cut we also created proportion bar chart. This chart will help us answer questions such as does a particular cut type occur more often for a particular color in our data set?
+To find a correlation between color and cut we also created proportion bar chart. This chart will help us answer questions such as does a particular cut type occur more often for a particular color in our data set?
 In the below color and cut plot, we can see that the proportion of Astor ideal cut is higher for F color-grade diamond compared to others. But no other major bias was found between color and cut.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
+d$cut <- factor(d$cut, levels=c("Good", "Very Good", "Ideal", "Astor Ideal"))
 ggplot(d, aes(x=color, fill=cut))+
   geom_bar(position = "fill")+
   labs(x="Color", y="Proportion of Cut",
@@ -80,20 +73,12 @@ ggplot(d, aes(x=color, fill=cut))+
 ```
 
 
-## Color and Clarity
+### Color and Clarity
 
-We did a similar analysis for color and clarity, where we grouped the data set by clarity and then tried to assess the impact of color on each individual group. The box plots in this case also didn't show strong evidence , atleast in most of the groupings, that colorless diamonds should cost higher than the more colored ones. This maybe because variables other than clarity and color might be influencing the price.
+To find a correlation between color and clarity we also created proportion bar chart. This chart will help us answer questions such as does a particular clarity occur more often for a particular color in our data set?. In the below color and clarity plot, we can interestingly see that the best clarity, which is FL, only occurs for D and F grade diamonds in our data set. 
 
-
-```{r, echo=FALSE}
-ggplot(d, aes(color, log10(price), fill=color))+
-  geom_boxplot()+
-  facet_wrap(~clarity)
-  labs(x="Color", y="log10(Price)", title="log10(Price) vs Color grouped by clarity")
-```
-Then to find a correlation between color and clarity we also created proportion bar chart. This chart will help us answer questions such as does a particular clarity occur more often for a particular color in our data set?. In the below color and clarity plot, we can interestingly see that the best clarity, which is FL, only occurs for D and F grade diamonds in our data set. 
-
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
+d$clarity <- factor(d$clarity, levels=c("SI2", "SI1", "VS2", "VS1", "VVS2", "VVS1", "IF", "FL"))
 ggplot(d, aes(x=color, fill=clarity))+
   geom_bar(position = "fill")+
   labs(x="Color", y="Proportion of Clarity",
